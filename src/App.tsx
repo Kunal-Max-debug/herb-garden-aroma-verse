@@ -12,7 +12,7 @@ import PlantDetail from "./pages/PlantDetail";
 import AboutPage from "./pages/About";
 import CategoriesPage from "./pages/Categories";
 
-// Create a client
+// Create a client outside the component
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -21,8 +21,9 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
-  <React.StrictMode>
+// Define App as a proper function component
+function App() {
+  return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
@@ -39,7 +40,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
-  </React.StrictMode>
-);
+  );
+}
 
 export default App;
