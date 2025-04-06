@@ -1,4 +1,5 @@
 
+import React from 'react';
 import Layout from '@/components/layout/Layout';
 import HeroSection from '@/components/home/HeroSection';
 import FeaturedPlants from '@/components/home/FeaturedPlants';
