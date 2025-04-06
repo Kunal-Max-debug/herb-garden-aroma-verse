@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				garden: {
+					primary: '#2e7d32',
+					secondary: '#4caf50',
+					accent: '#8bc34a',
+					dark: '#1b5e20',
+					light: '#c8e6c9',
+					text: '#212121',
+					surface: '#f9fbe7'
 				}
 			},
 			borderRadius: {
@@ -70,25 +80,30 @@ export default {
 			},
 			keyframes: {
 				'accordion-down': {
-					from: {
-						height: '0'
-					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
-					}
+					from: { height: '0' },
+					to: { height: 'var(--radix-accordion-content-height)' }
 				},
 				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
-					},
-					to: {
-						height: '0'
-					}
+					from: { height: 'var(--radix-accordion-content-height)' },
+					to: { height: '0' }
+				},
+				'leaf-sway': {
+					'0%, 100%': { transform: 'rotate(-2deg)' },
+					'50%': { transform: 'rotate(2deg)' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0', transform: 'translateY(10px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'leaf-sway': 'leaf-sway 5s ease-in-out infinite',
+				'fade-in': 'fade-in 0.5s ease-out'
+			},
+			backgroundImage: {
+				'garden-pattern': "url('/public/lovable-uploads/84200899-78a8-45bb-964b-504f851355f7.png')"
 			}
 		}
 	},
