@@ -13,6 +13,14 @@ export interface Plant {
   medicinialRecipes: Recipe[];
   modelPath?: string; // Path to 3D model if available
   categories: string[];
+  parts?: PlantPart[]; // Added plant parts information
+}
+
+export interface PlantPart {
+  name: string;
+  description: string;
+  uses: string[];
+  position: { x: number, y: number };
 }
 
 export interface Recipe {
