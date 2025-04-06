@@ -12,25 +12,34 @@ import PlantDetail from "./pages/PlantDetail";
 import AboutPage from "./pages/About";
 import CategoriesPage from "./pages/Categories";
 
-const queryClient = new QueryClient();
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+    },
+  },
+});
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/garden" element={<GardenPage />} />
-          <Route path="/plant/:id" element={<PlantDetail />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/categories" element={<CategoriesPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/garden" element={<GardenPage />} />
+            <Route path="/plant/:id" element={<PlantDetail />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/categories" element={<CategoriesPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;
