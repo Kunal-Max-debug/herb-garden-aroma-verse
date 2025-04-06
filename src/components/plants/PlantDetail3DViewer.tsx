@@ -17,69 +17,87 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
 
-  // Placeholder for 3D rotation - in a real app, this would use a 3D library
+  // Handle auto-rotation animation with requestAnimationFrame for smoother performance
   useEffect(() => {
-    let rotationInterval: NodeJS.Timeout | null = null;
+    let animationFrameId: number;
     
     if (isRotating && imageRef.current) {
-      let rotation = 0;
-      rotationInterval = setInterval(() => {
-        rotation = (rotation + 1) % 360;
-        if (imageRef.current) {
-          imageRef.current.style.transform = `rotate(${rotation}deg) scale(${zoom})`;
-        }
-      }, 50);
+      let lastTimestamp: number;
+      
+      const animate = (timestamp: number) => {
+        if (!lastTimestamp) lastTimestamp = timestamp;
+        const deltaTime = timestamp - lastTimestamp;
+        lastTimestamp = timestamp;
+        
+        // Adjust speed based on deltaTime for smoother animation
+        setRotation(prevRotation => (prevRotation + deltaTime * 0.05) % 360);
+        
+        animationFrameId = requestAnimationFrame(animate);
+      };
+      
+      animationFrameId = requestAnimationFrame(animate);
     }
-
+    
     return () => {
-      if (rotationInterval) clearInterval(rotationInterval);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
     };
-  }, [isRotating, zoom]);
+  }, [isRotating]);
+  
+  // Apply rotation and zoom to image
+  useEffect(() => {
+    if (imageRef.current) {
+      imageRef.current.style.transform = `rotate(${rotation}deg) scale(${zoom})`;
+    }
+  }, [rotation, zoom]);
+
+  // Handle fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
 
   const toggleRotation = () => {
-    if (isRotating) {
-      setIsRotating(false);
-      if (imageRef.current) {
-        imageRef.current.style.transform = `scale(${zoom})`;
+    setIsRotating(prev => {
+      const newState = !prev;
+      if (newState) {
+        toast("360° rotation started");
       }
-    } else {
-      setIsRotating(true);
-      toast("3D rotation started");
-    }
+      return newState;
+    });
   };
 
   const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      containerRef.current?.requestFullscreen().then(() => {
-        setIsFullscreen(true);
-      }).catch(err => {
-        toast.error(`Error attempting to enable fullscreen: ${err.message}`);
+    if (!document.fullscreenElement && containerRef.current) {
+      containerRef.current.requestFullscreen().catch(err => {
+        toast.error(`Error entering fullscreen: ${err.message}`);
       });
     } else {
-      document.exitFullscreen().then(() => {
-        setIsFullscreen(false);
+      document.exitFullscreen().catch(err => {
+        toast.error(`Error exiting fullscreen: ${err.message}`);
       });
     }
   };
 
   const handleZoomIn = () => {
     if (zoom < 2) {
-      const newZoom = zoom + 0.1;
-      setZoom(newZoom);
-      if (imageRef.current) {
-        imageRef.current.style.transform = `scale(${newZoom})`;
-      }
+      setZoom(prev => Math.min(prev + 0.1, 2));
     }
   };
 
   const handleZoomOut = () => {
     if (zoom > 0.5) {
-      const newZoom = zoom - 0.1;
-      setZoom(newZoom);
-      if (imageRef.current) {
-        imageRef.current.style.transform = `scale(${newZoom})`;
-      }
+      setZoom(prev => Math.max(prev - 0.1, 0.5));
     }
   };
 
@@ -98,9 +116,16 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
           <img
             ref={imageRef}
             src={imageUrl}
-            alt={`3D model of ${plantId}`}
+            alt={`3D view of ${plantId}`}
             className="w-auto h-full max-h-full object-contain transition-transform duration-300"
             style={{ transformOrigin: 'center center' }}
+            onError={(e) => {
+              // Fallback in case the image fails to load
+              const imgElement = e.currentTarget;
+              imgElement.onerror = null; // Prevent infinite fallback loop
+              imgElement.src = '/placeholder.svg';
+              toast.error("Failed to load plant image");
+            }}
           />
           
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2 bg-black/60 rounded-full p-1.5 backdrop-blur-sm">
@@ -109,6 +134,7 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
               size="icon" 
               onClick={toggleRotation}
               className={`rounded-full ${isRotating ? 'bg-garden-primary text-white' : 'text-white hover:bg-white/20'}`}
+              aria-label={isRotating ? "Stop rotation" : "Start rotation"}
             >
               <RotateCw size={18} />
             </Button>
@@ -117,6 +143,7 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
               size="icon"
               onClick={handleZoomIn}
               className="rounded-full text-white hover:bg-white/20"
+              aria-label="Zoom in"
             >
               <ZoomIn size={18} />
             </Button>
@@ -125,6 +152,7 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
               size="icon"
               onClick={handleZoomOut}
               className="rounded-full text-white hover:bg-white/20"
+              aria-label="Zoom out"
             >
               <ZoomOut size={18} />
             </Button>
@@ -133,13 +161,14 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
               size="icon"
               onClick={toggleFullscreen}
               className="rounded-full text-white hover:bg-white/20"
+              aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
             >
               {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
             </Button>
           </div>
 
           <div className="absolute top-4 left-4 bg-black/60 text-white px-3 py-1 rounded-md text-sm backdrop-blur-sm">
-            Interactive View
+            360° View
           </div>
 
           {modelPath === undefined && (
@@ -154,3 +183,4 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
 };
 
 export default PlantDetail3DViewer;
+
