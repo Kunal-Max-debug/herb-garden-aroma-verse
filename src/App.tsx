@@ -11,6 +11,7 @@ import GardenPage from "./pages/Garden";
 import PlantDetail from "./pages/PlantDetail";
 import AboutPage from "./pages/About";
 import CategoriesPage from "./pages/Categories";
+import AiRecommendations from "./pages/AiRecommendations";
 
 // Create a client outside the component
 const queryClient = new QueryClient({
@@ -35,6 +36,7 @@ function App() {
             <Route path="/plant/:id" element={<PlantDetail />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
+            <Route path="/ai-recommendations" element={<AiRecommendations />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -1,7 +1,16 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { RotateCw, ZoomIn, ZoomOut, Maximize2, Minimize2, Info } from 'lucide-react';
+import { 
+  RotateCw, 
+  ZoomIn, 
+  ZoomOut, 
+  Maximize2, 
+  Minimize2, 
+  Info,
+  Smartphone,
+  Glasses
+} from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import {
@@ -40,6 +49,7 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
   const [rotation, setRotation] = useState(0);
   const [selectedPart, setSelectedPart] = useState<PlantPartInfo | null>(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [viewMode, setViewMode] = useState<'standard' | 'ar' | 'vr'>('standard');
   
   // Sample plant parts data - would normally come from an API
   const plantParts: Record<string, PlantPartInfo[]> = {
@@ -183,6 +193,30 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
     }
   };
 
+  const activateAR = () => {
+    // Check if the browser supports WebXR
+    if ('xr' in navigator) {
+      setViewMode('ar');
+      toast.success("AR mode activated! Point your camera at a flat surface.");
+    } else {
+      toast.error("Your browser doesn't support AR. Try using Chrome or Safari on a compatible device.");
+    }
+  };
+
+  const activateVR = () => {
+    // Check if the browser supports WebXR VR
+    if ('xr' in navigator) {
+      setViewMode('vr');
+      toast.success("VR mode activated! Use a compatible VR headset for the best experience.");
+    } else {
+      toast.error("Your browser doesn't support VR. Try using a WebXR compatible browser and device.");
+    }
+  };
+
+  const resetViewMode = () => {
+    setViewMode('standard');
+  };
+
   return (
     <Card className="border border-garden-light bg-black/5 overflow-hidden">
       <CardContent className="p-0 relative">
@@ -244,6 +278,29 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
             </div>
           ))}
           
+          {/* View mode indicator */}
+          {viewMode !== 'standard' && (
+            <div className="absolute top-4 left-4 right-4 bg-black/80 text-white px-4 py-2 rounded-md text-sm backdrop-blur-sm flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                {viewMode === 'ar' ? (
+                  <>
+                    <Smartphone size={16} />
+                    AR View Active
+                  </>
+                ) : (
+                  <>
+                    <Glasses size={16} />
+                    VR View Active
+                  </>
+                )}
+              </span>
+              <Button variant="link" className="text-white p-0 h-auto" onClick={resetViewMode}>
+                Exit {viewMode.toUpperCase()} Mode
+              </Button>
+            </div>
+          )}
+          
+          {/* Main controls */}
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2 bg-black/60 rounded-full p-1.5 backdrop-blur-sm">
             <Button 
               variant="ghost" 
@@ -281,10 +338,28 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
             >
               {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
             </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={activateAR}
+              className={`rounded-full ${viewMode === 'ar' ? 'bg-garden-primary text-white' : 'text-white hover:bg-white/20'}`}
+              aria-label="View in AR"
+            >
+              <Smartphone size={18} />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={activateVR}
+              className={`rounded-full ${viewMode === 'vr' ? 'bg-garden-primary text-white' : 'text-white hover:bg-white/20'}`}
+              aria-label="View in VR"
+            >
+              <Glasses size={18} />
+            </Button>
           </div>
 
-          <div className="absolute top-4 left-4 bg-black/60 text-white px-3 py-1 rounded-md text-sm backdrop-blur-sm">
-            360° View
+          <div className="absolute top-4 right-4 bg-black/60 text-white px-3 py-1 rounded-md text-sm backdrop-blur-sm">
+            {viewMode === 'standard' ? '360° View' : viewMode === 'ar' ? 'AR View' : 'VR View'}
           </div>
 
           {modelPath === undefined && (
