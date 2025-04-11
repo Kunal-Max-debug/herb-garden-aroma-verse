@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Leaf, Menu, X, Bot } from 'lucide-react';
+import ProfileButton from './ProfileButton';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,61 +23,66 @@ const Navbar = () => {
           </Link>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1">
-            <Link 
-              to="/" 
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive('/') 
-                ? 'text-garden-primary bg-garden-light' 
-                : 'text-gray-600 hover:text-garden-primary hover:bg-garden-light/50'
-              }`}
-            >
-              Home
-            </Link>
-            <Link 
-              to="/garden" 
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive('/garden') 
-                ? 'text-garden-primary bg-garden-light' 
-                : 'text-gray-600 hover:text-garden-primary hover:bg-garden-light/50'
-              }`}
-            >
-              Garden
-            </Link>
-            <Link 
-              to="/categories" 
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive('/categories') 
-                ? 'text-garden-primary bg-garden-light' 
-                : 'text-gray-600 hover:text-garden-primary hover:bg-garden-light/50'
-              }`}
-            >
-              Categories
-            </Link>
-            <Link 
-              to="/ai-recommendations" 
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive('/ai-recommendations') 
-                ? 'text-garden-primary bg-garden-light' 
-                : 'text-gray-600 hover:text-garden-primary hover:bg-garden-light/50'
-              }`}
-            >
-              <span className="flex items-center gap-1">
-                <Bot size={16} />
-                AI Recommendations
-              </span>
-            </Link>
-            <Link 
-              to="/about" 
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive('/about') 
-                ? 'text-garden-primary bg-garden-light' 
-                : 'text-gray-600 hover:text-garden-primary hover:bg-garden-light/50'
-              }`}
-            >
-              About
-            </Link>
-          </nav>
+          <div className="hidden md:flex items-center justify-between flex-1 ml-6">
+            <nav className="flex items-center space-x-1">
+              <Link 
+                to="/" 
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive('/') 
+                  ? 'text-garden-primary bg-garden-light' 
+                  : 'text-gray-600 hover:text-garden-primary hover:bg-garden-light/50'
+                }`}
+              >
+                Home
+              </Link>
+              <Link 
+                to="/garden" 
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive('/garden') 
+                  ? 'text-garden-primary bg-garden-light' 
+                  : 'text-gray-600 hover:text-garden-primary hover:bg-garden-light/50'
+                }`}
+              >
+                Garden
+              </Link>
+              <Link 
+                to="/categories" 
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive('/categories') 
+                  ? 'text-garden-primary bg-garden-light' 
+                  : 'text-gray-600 hover:text-garden-primary hover:bg-garden-light/50'
+                }`}
+              >
+                Categories
+              </Link>
+              <Link 
+                to="/ai-recommendations" 
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive('/ai-recommendations') 
+                  ? 'text-garden-primary bg-garden-light' 
+                  : 'text-gray-600 hover:text-garden-primary hover:bg-garden-light/50'
+                }`}
+              >
+                <span className="flex items-center gap-1">
+                  <Bot size={16} />
+                  AI Recommendations
+                </span>
+              </Link>
+              <Link 
+                to="/about" 
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive('/about') 
+                  ? 'text-garden-primary bg-garden-light' 
+                  : 'text-gray-600 hover:text-garden-primary hover:bg-garden-light/50'
+                }`}
+              >
+                About
+              </Link>
+            </nav>
+            
+            {/* Profile Button */}
+            <ProfileButton />
+          </div>
           
           {/* Mobile Menu Button */}
           <Button 
@@ -156,6 +162,24 @@ const Navbar = () => {
               >
                 About
               </Link>
+              <div className="border-t border-gray-200 pt-2 mt-1">
+                <div className="flex flex-col space-y-2">
+                  <Link
+                    to="/login"
+                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-600"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="px-3 py-2 rounded-md text-sm font-medium text-garden-primary bg-garden-light/50"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              </div>
             </div>
           </nav>
         )}
