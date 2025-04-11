@@ -9,16 +9,19 @@ import {
   Minimize2, 
   Info,
   Smartphone,
-  Glasses
+  Glasses,
+  Hand,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { Slider } from "@/components/ui/slider";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   ContextMenu,
@@ -482,6 +485,10 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
   const [selectedPart, setSelectedPart] = useState<PlantPartInfo | null>(null);
   const [showDialog, setShowDialog] = useState(false);
   const [viewMode, setViewMode] = useState<'standard' | 'ar' | 'vr'>('standard');
+  const [isDragging, setIsDragging] = useState(false);
+  const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 });
+  const [rotationSpeed, setRotationSpeed] = useState(1);
+  const [showControls, setShowControls] = useState(true);
   
   // Get the plant parts for the current plant
   const currentPlantParts = plantPartsData[plantId] || [];
@@ -498,8 +505,8 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
         const deltaTime = timestamp - lastTimestamp;
         lastTimestamp = timestamp;
         
-        // Adjust speed based on deltaTime for smoother animation
-        setRotation(prevRotation => (prevRotation + deltaTime * 0.05) % 360);
+        // Adjust speed based on deltaTime and rotationSpeed for smoother animation
+        setRotation(prevRotation => (prevRotation + deltaTime * 0.05 * rotationSpeed) % 360);
         
         animationFrameId = requestAnimationFrame(animate);
       };
@@ -512,7 +519,7 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [isRotating]);
+  }, [isRotating, rotationSpeed]);
   
   // Apply rotation and zoom to image
   useEffect(() => {
@@ -533,6 +540,43 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, []);
+
+  // Mouse/touch event handlers for manual rotation
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+    setIsDragging(true);
+    setIsRotating(false); // Stop auto-rotation when manually rotating
+    
+    // Get clientX from either mouse or touch event
+    const clientX = 'touches' in e 
+      ? e.touches[0].clientX 
+      : e.clientX;
+    
+    setLastPosition({
+      x: clientX,
+      y: 0
+    });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDragging) return;
+    
+    // Get clientX from either mouse or touch event
+    const clientX = 'touches' in e 
+      ? e.touches[0].clientX 
+      : e.clientX;
+    
+    const deltaX = clientX - lastPosition.x;
+    setRotation(prev => (prev - deltaX * 0.5) % 360);
+    
+    setLastPosition({
+      x: clientX,
+      y: 0
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
   const toggleRotation = () => {
     setIsRotating(prev => {
@@ -601,34 +645,61 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
     setViewMode('standard');
   };
 
+  const toggleControls = () => {
+    setShowControls(prev => !prev);
+  };
+
   return (
     <Card className="border border-garden-light bg-black/5 overflow-hidden">
       <CardContent className="p-0 relative">
         <div 
           ref={containerRef} 
-          className={`relative ${isFullscreen ? 'h-screen flex items-center justify-center' : 'h-[400px]'} overflow-hidden bg-[url('/assets/grid-pattern.svg')]`}
+          className={`relative ${isFullscreen ? 'h-screen flex items-center justify-center' : 'h-[500px]'} overflow-hidden bg-[url('/assets/grid-pattern.svg')]`}
           style={{
             backgroundImage: "linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.6)), url('/assets/grid-pattern.svg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
+            cursor: isDragging ? 'grabbing' : 'grab'
           }}
         >
+          {/* Flipkart-style drag instruction overlay */}
+          {!isDragging && !isRotating && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+              <div className="bg-black/70 text-white px-6 py-3 rounded-full flex items-center gap-2 animate-pulse">
+                <Hand size={20} />
+                <span>Drag to rotate</span>
+              </div>
+            </div>
+          )}
+          
           <ContextMenu>
             <ContextMenuTrigger>
-              <img
-                ref={imageRef}
-                src={imageUrl}
-                alt={`3D view of ${plantId}`}
-                className="w-auto h-full max-h-full object-contain transition-transform duration-300"
-                style={{ transformOrigin: 'center center' }}
-                onError={(e) => {
-                  // Fallback in case the image fails to load
-                  const imgElement = e.currentTarget;
-                  imgElement.onerror = null; // Prevent infinite fallback loop
-                  imgElement.src = '/placeholder.svg';
-                  toast.error("Failed to load plant image");
-                }}
-              />
+              <div 
+                className="w-full h-full flex items-center justify-center"
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                onTouchStart={handleMouseDown}
+                onTouchMove={handleMouseMove}
+                onTouchEnd={handleMouseUp}
+              >
+                <img
+                  ref={imageRef}
+                  src={imageUrl}
+                  alt={`3D view of ${plantId}`}
+                  className="w-auto h-full max-h-full object-contain transition-transform duration-300"
+                  style={{ transformOrigin: 'center center' }}
+                  onError={(e) => {
+                    // Fallback in case the image fails to load
+                    const imgElement = e.currentTarget;
+                    imgElement.onerror = null; // Prevent infinite fallback loop
+                    imgElement.src = '/placeholder.svg';
+                    toast.error("Failed to load plant image");
+                  }}
+                  draggable={false}
+                />
+              </div>
             </ContextMenuTrigger>
             <ContextMenuContent className="w-64">
               <div className="px-2 py-1.5 text-sm font-semibold">Plant Parts</div>
@@ -649,7 +720,7 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
           {currentPlantParts.map((part, index) => (
             <div 
               key={index}
-              className="absolute w-6 h-6 bg-white/80 rounded-full flex items-center justify-center cursor-pointer transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform"
+              className="absolute w-6 h-6 bg-white/80 rounded-full flex items-center justify-center cursor-pointer transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform shadow-lg"
               style={{ 
                 left: `${part.position.x}%`, 
                 top: `${part.position.y}%`,
@@ -684,70 +755,102 @@ const PlantDetail3DViewer = ({ plantId, modelPath, imageUrl }: PlantDetail3DView
             </div>
           )}
           
-          {/* Main controls */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2 bg-black/60 rounded-full p-1.5 backdrop-blur-sm">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleRotation}
-              className={`rounded-full ${isRotating ? 'bg-garden-primary text-white' : 'text-white hover:bg-white/20'}`}
-              aria-label={isRotating ? "Stop rotation" : "Start rotation"}
-            >
-              <RotateCw size={18} />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={handleZoomIn}
-              className="rounded-full text-white hover:bg-white/20"
-              aria-label="Zoom in"
-            >
-              <ZoomIn size={18} />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={handleZoomOut}
-              className="rounded-full text-white hover:bg-white/20"
-              aria-label="Zoom out"
-            >
-              <ZoomOut size={18} />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={toggleFullscreen}
-              className="rounded-full text-white hover:bg-white/20"
-              aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-            >
-              {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={activateAR}
-              className={`rounded-full ${viewMode === 'ar' ? 'bg-garden-primary text-white' : 'text-white hover:bg-white/20'}`}
-              aria-label="View in AR"
-            >
-              <Smartphone size={18} />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={activateVR}
-              className={`rounded-full ${viewMode === 'vr' ? 'bg-garden-primary text-white' : 'text-white hover:bg-white/20'}`}
-              aria-label="View in VR"
-            >
-              <Glasses size={18} />
-            </Button>
-          </div>
+          {/* Toggle controls button - always visible */}
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={toggleControls}
+            className="absolute top-4 left-4 rounded-full bg-black/60 text-white hover:bg-black/80 z-20"
+            aria-label={showControls ? "Hide controls" : "Show controls"}
+          >
+            {showControls ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
+          </Button>
+          
+          {/* Flipkart-style controls panel */}
+          {showControls && (
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/70 backdrop-blur-sm rounded-lg p-3 flex flex-col gap-3 z-20">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleRotation}
+                className={`rounded-full ${isRotating ? 'bg-garden-primary text-white' : 'text-white hover:bg-white/20'}`}
+                aria-label={isRotating ? "Stop rotation" : "Start rotation"}
+              >
+                <RotateCw size={18} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={handleZoomIn}
+                className="rounded-full text-white hover:bg-white/20"
+                aria-label="Zoom in"
+              >
+                <ZoomIn size={18} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={handleZoomOut}
+                className="rounded-full text-white hover:bg-white/20"
+                aria-label="Zoom out"
+              >
+                <ZoomOut size={18} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={toggleFullscreen}
+                className="rounded-full text-white hover:bg-white/20"
+                aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+              >
+                {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+              </Button>
+              <div className="h-px bg-white/20 my-1"></div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={activateAR}
+                className={`rounded-full ${viewMode === 'ar' ? 'bg-garden-primary text-white' : 'text-white hover:bg-white/20'}`}
+                aria-label="View in AR"
+              >
+                <Smartphone size={18} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={activateVR}
+                className={`rounded-full ${viewMode === 'vr' ? 'bg-garden-primary text-white' : 'text-white hover:bg-white/20'}`}
+                aria-label="View in VR"
+              >
+                <Glasses size={18} />
+              </Button>
+            </div>
+          )}
+          
+          {/* Rotation speed control - Flipkart style */}
+          {showControls && isRotating && (
+            <div className="absolute bottom-16 left-4 right-4 bg-black/60 p-3 rounded-lg flex flex-col gap-2 backdrop-blur-sm">
+              <div className="flex justify-between text-white text-xs">
+                <span>Rotation Speed</span>
+                <span>{rotationSpeed.toFixed(1)}x</span>
+              </div>
+              <Slider
+                value={[rotationSpeed]}
+                min={0.1}
+                max={2.0}
+                step={0.1}
+                onValueChange={(values) => setRotationSpeed(values[0])}
+                className="w-full"
+              />
+            </div>
+          )}
 
           <div className="absolute top-4 right-4 bg-black/60 text-white px-3 py-1 rounded-md text-sm backdrop-blur-sm">
             {viewMode === 'standard' ? '360° View' : viewMode === 'ar' ? 'AR View' : 'VR View'}
           </div>
 
           {modelPath === undefined && (
-            <div className="absolute top-4 left-4 bg-yellow-500/80 text-black px-3 py-1 rounded-md text-sm backdrop-blur-sm">
+            <div className="absolute top-4 left-16 bg-yellow-500/80 text-black px-3 py-1 rounded-md text-sm backdrop-blur-sm">
               Interactive 3D Model
             </div>
           )}
