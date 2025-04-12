@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,8 +9,9 @@ import { Slider } from '@/components/ui/slider';
 import { Sun, Moon, Leaf, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Import tulsi plant image
-import tulsiPlantImage from '/lovable-uploads/94d7d60b-2cef-4c20-983e-77485db4f367.png';
+// Import a placeholder image for tulsi plant instead of the missing image
+// Using a relative path to ensure it can be found
+import tulsiPlantImage from '../assets/tulsi-plant.png';
 
 const StartTour = () => {
   const { isLoggedIn } = useAuth();
