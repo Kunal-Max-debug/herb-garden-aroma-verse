@@ -10,6 +10,9 @@ import { Slider } from '@/components/ui/slider';
 import { Sun, Moon, Leaf, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Import tulsi plant image
+import tulsiPlantImage from '/lovable-uploads/94d7d60b-2cef-4c20-983e-77485db4f367.png';
+
 const StartTour = () => {
   const { isLoggedIn } = useAuth();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -74,14 +77,13 @@ const StartTour = () => {
         camera.position.y = 2;
         camera.lookAt(0, 1, 0);
         
-        // Function to create plant model based on selection and growth stage
+        // Create plant model based on selection and growth stage
         const createPlantModel = () => {
           if (plant3D) {
             scene.remove(plant3D);
           }
           
-          // Simple placeholder geometry for different plants and growth stages
-          let geometry, material;
+          plant3D = new THREE.Group();
           
           // Base color by plant type
           let plantColor = {
@@ -104,108 +106,174 @@ const StartTour = () => {
           // Growth stage affects the size and complexity
           const stageMultiplier = 0.3 + (growthStage * 0.7);
           
-          // Create growth stage appropriate model
-          if (growthStage < 0.3) {
-            // Seedling
-            geometry = new THREE.CylinderGeometry(0.05, 0.05, 0.2 * stageMultiplier, 8);
-            material = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // Brown stem
+          if (plant === 'tulsi') {
+            // Create a special tulsi plant using the provided image
+            const textureLoader = new THREE.TextureLoader();
+            const tulsiTexture = textureLoader.load(tulsiPlantImage);
             
-            const stemMesh = new THREE.Mesh(geometry, material);
-            stemMesh.position.y = 0.1 * stageMultiplier;
-            
-            // Small leaves
-            const leafGeometry = new THREE.SphereGeometry(0.1 * stageMultiplier, 8, 8);
-            const leafMaterial = new THREE.MeshStandardMaterial({ color: plantColor });
-            const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
-            leaf.position.y = 0.2 * stageMultiplier;
-            
-            plant3D = new THREE.Group();
-            plant3D.add(stemMesh);
-            plant3D.add(leaf);
-          } 
-          else if (growthStage < 0.6) {
-            // Young plant
-            geometry = new THREE.CylinderGeometry(0.1, 0.15, 0.8 * stageMultiplier, 8);
-            material = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // Brown stem
-            
-            const stemMesh = new THREE.Mesh(geometry, material);
-            stemMesh.position.y = 0.4 * stageMultiplier;
-            
-            // Several leaves
-            plant3D = new THREE.Group();
-            plant3D.add(stemMesh);
-            
-            for (let i = 0; i < 3; i++) {
-              const leafGeometry = new THREE.SphereGeometry(0.15 * stageMultiplier, 8, 8);
-              leafGeometry.scale(1, 0.5, 1);
-              const leafMaterial = new THREE.MeshStandardMaterial({ color: plantColor });
-              const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
-              leaf.position.y = 0.4 + (i * 0.2) * stageMultiplier;
-              leaf.rotation.z = i * (Math.PI * 2 / 3);
-              leaf.position.x = Math.sin(i * (Math.PI * 2 / 3)) * 0.3 * stageMultiplier;
-              leaf.position.z = Math.cos(i * (Math.PI * 2 / 3)) * 0.3 * stageMultiplier;
-              plant3D.add(leaf);
-            }
-          }
-          else {
-            // Mature plant
-            geometry = new THREE.CylinderGeometry(0.15, 0.2, 1.5 * stageMultiplier, 8);
-            material = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // Brown stem
-            
-            const stemMesh = new THREE.Mesh(geometry, material);
-            stemMesh.position.y = 0.75 * stageMultiplier;
-            
-            plant3D = new THREE.Group();
-            plant3D.add(stemMesh);
-            
-            // Multiple branches with leaves
-            for (let i = 0; i < 5; i++) {
-              const branchGeometry = new THREE.CylinderGeometry(0.05, 0.08, 0.5 * stageMultiplier, 8);
-              const branchMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
-              const branch = new THREE.Mesh(branchGeometry, branchMaterial);
+            if (growthStage < 0.3) {
+              // Small seedling using billboard technique
+              const geometry = new THREE.PlaneGeometry(0.8 * stageMultiplier, 0.8 * stageMultiplier);
+              const material = new THREE.MeshBasicMaterial({ 
+                map: tulsiTexture,
+                transparent: true,
+                side: THREE.DoubleSide
+              });
+              const tulsiPlane = new THREE.Mesh(geometry, material);
+              tulsiPlane.position.y = 0.4 * stageMultiplier;
+              plant3D.add(tulsiPlane);
               
-              branch.position.y = 0.6 + (i * 0.2) * stageMultiplier;
-              branch.rotation.z = Math.PI / 4;
-              branch.rotation.y = i * (Math.PI * 2 / 5);
-              branch.position.x = Math.sin(i * (Math.PI * 2 / 5)) * 0.3;
-              branch.position.z = Math.cos(i * (Math.PI * 2 / 5)) * 0.3;
+              // Add a second plane rotated 90 degrees for 3D effect
+              const tulsiPlane2 = new THREE.Mesh(geometry, material);
+              tulsiPlane2.position.y = 0.4 * stageMultiplier;
+              tulsiPlane2.rotation.y = Math.PI / 2;
+              plant3D.add(tulsiPlane2);
+            } 
+            else if (growthStage < 0.6) {
+              // Medium sized plant with multiple cross planes
+              const geometry = new THREE.PlaneGeometry(1.3 * stageMultiplier, 1.3 * stageMultiplier);
+              const material = new THREE.MeshBasicMaterial({ 
+                map: tulsiTexture,
+                transparent: true,
+                side: THREE.DoubleSide
+              });
               
-              // Leaves on each branch
-              const leafGeometry = new THREE.SphereGeometry(0.2 * stageMultiplier, 8, 8);
-              leafGeometry.scale(1, 0.5, 1);
-              const leafMaterial = new THREE.MeshStandardMaterial({ color: plantColor });
-              const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
-              leaf.position.y = 0.3 * stageMultiplier;
-              leaf.position.x = 0.2 * stageMultiplier;
-              
-              branch.add(leaf);
-              plant3D.add(branch);
-            }
-            
-            // For mature plants, add flowers/fruits based on plant type
-            if (plant === 'tulsi' || plant === 'mint') {
-              // Add small flowers on top
-              const flowerGeometry = new THREE.SphereGeometry(0.1, 8, 8);
-              const flowerMaterial = new THREE.MeshStandardMaterial({ color: 0x9932CC }); // Purple
-              
-              for (let i = 0; i < 7; i++) {
-                const flower = new THREE.Mesh(flowerGeometry, flowerMaterial);
-                flower.position.y = 1.6 * stageMultiplier;
-                flower.position.x = (Math.random() - 0.5) * 0.4;
-                flower.position.z = (Math.random() - 0.5) * 0.4;
-                plant3D.add(flower);
+              // Create multiple planes at different angles
+              for (let i = 0; i < 4; i++) {
+                const tulsiPlane = new THREE.Mesh(geometry, material);
+                tulsiPlane.position.y = 0.65 * stageMultiplier;
+                tulsiPlane.rotation.y = i * Math.PI / 4;
+                plant3D.add(tulsiPlane);
               }
-            } else if (plant === 'neem') {
-              // Add fruits
-              const fruitGeometry = new THREE.SphereGeometry(0.08, 8, 8);
-              const fruitMaterial = new THREE.MeshStandardMaterial({ color: 0xFFD700 }); // Gold
+            }
+            else {
+              // Full grown plant with multiple intersecting planes
+              const geometry = new THREE.PlaneGeometry(2 * stageMultiplier, 2 * stageMultiplier);
+              const material = new THREE.MeshBasicMaterial({ 
+                map: tulsiTexture,
+                transparent: true,
+                side: THREE.DoubleSide
+              });
               
+              // Create multiple planes at different angles
+              for (let i = 0; i < 8; i++) {
+                const tulsiPlane = new THREE.Mesh(geometry, material);
+                tulsiPlane.position.y = 1 * stageMultiplier;
+                tulsiPlane.rotation.y = i * Math.PI / 8;
+                plant3D.add(tulsiPlane);
+              }
+              
+              // Add a smaller group of planes higher up
+              const topGeometry = new THREE.PlaneGeometry(1.2 * stageMultiplier, 1.2 * stageMultiplier);
+              for (let i = 0; i < 6; i++) {
+                const topPlane = new THREE.Mesh(topGeometry, material);
+                topPlane.position.y = 1.5 * stageMultiplier;
+                topPlane.rotation.y = i * Math.PI / 6;
+                plant3D.add(topPlane);
+              }
+            }
+          } else {
+            // Use the existing geometry for other plants
+            // Create growth stage appropriate model
+            if (growthStage < 0.3) {
+              // Seedling
+              const geometry = new THREE.CylinderGeometry(0.05, 0.05, 0.2 * stageMultiplier, 8);
+              const material = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // Brown stem
+              
+              const stemMesh = new THREE.Mesh(geometry, material);
+              stemMesh.position.y = 0.1 * stageMultiplier;
+              
+              // Small leaves
+              const leafGeometry = new THREE.SphereGeometry(0.1 * stageMultiplier, 8, 8);
+              const leafMaterial = new THREE.MeshStandardMaterial({ color: plantColor });
+              const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+              leaf.position.y = 0.2 * stageMultiplier;
+              
+              plant3D.add(stemMesh);
+              plant3D.add(leaf);
+            } 
+            else if (growthStage < 0.6) {
+              // Young plant
+              const geometry = new THREE.CylinderGeometry(0.1, 0.15, 0.8 * stageMultiplier, 8);
+              const material = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // Brown stem
+              
+              const stemMesh = new THREE.Mesh(geometry, material);
+              stemMesh.position.y = 0.4 * stageMultiplier;
+              
+              // Several leaves
+              plant3D.add(stemMesh);
+              
+              for (let i = 0; i < 3; i++) {
+                const leafGeometry = new THREE.SphereGeometry(0.15 * stageMultiplier, 8, 8);
+                leafGeometry.scale(1, 0.5, 1);
+                const leafMaterial = new THREE.MeshStandardMaterial({ color: plantColor });
+                const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+                leaf.position.y = 0.4 + (i * 0.2) * stageMultiplier;
+                leaf.rotation.z = i * (Math.PI * 2 / 3);
+                leaf.position.x = Math.sin(i * (Math.PI * 2 / 3)) * 0.3 * stageMultiplier;
+                leaf.position.z = Math.cos(i * (Math.PI * 2 / 3)) * 0.3 * stageMultiplier;
+                plant3D.add(leaf);
+              }
+            }
+            else {
+              // Mature plant
+              const geometry = new THREE.CylinderGeometry(0.15, 0.2, 1.5 * stageMultiplier, 8);
+              const material = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // Brown stem
+              
+              const stemMesh = new THREE.Mesh(geometry, material);
+              stemMesh.position.y = 0.75 * stageMultiplier;
+              
+              plant3D.add(stemMesh);
+              
+              // Multiple branches with leaves
               for (let i = 0; i < 5; i++) {
-                const fruit = new THREE.Mesh(fruitGeometry, fruitMaterial);
-                fruit.position.y = 1.2 * stageMultiplier;
-                fruit.position.x = Math.sin(i * (Math.PI * 2 / 5)) * 0.5;
-                fruit.position.z = Math.cos(i * (Math.PI * 2 / 5)) * 0.5;
-                plant3D.add(fruit);
+                const branchGeometry = new THREE.CylinderGeometry(0.05, 0.08, 0.5 * stageMultiplier, 8);
+                const branchMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                const branch = new THREE.Mesh(branchGeometry, branchMaterial);
+                
+                branch.position.y = 0.6 + (i * 0.2) * stageMultiplier;
+                branch.rotation.z = Math.PI / 4;
+                branch.rotation.y = i * (Math.PI * 2 / 5);
+                branch.position.x = Math.sin(i * (Math.PI * 2 / 5)) * 0.3;
+                branch.position.z = Math.cos(i * (Math.PI * 2 / 5)) * 0.3;
+                
+                // Leaves on each branch
+                const leafGeometry = new THREE.SphereGeometry(0.2 * stageMultiplier, 8, 8);
+                leafGeometry.scale(1, 0.5, 1);
+                const leafMaterial = new THREE.MeshStandardMaterial({ color: plantColor });
+                const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+                leaf.position.y = 0.3 * stageMultiplier;
+                leaf.position.x = 0.2 * stageMultiplier;
+                
+                branch.add(leaf);
+                plant3D.add(branch);
+              }
+              
+              // For mature plants, add flowers/fruits based on plant type
+              if (plant === 'neem') {
+                // Add fruits
+                const fruitGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+                const fruitMaterial = new THREE.MeshStandardMaterial({ color: 0xFFD700 }); // Gold
+                
+                for (let i = 0; i < 5; i++) {
+                  const fruit = new THREE.Mesh(fruitGeometry, fruitMaterial);
+                  fruit.position.y = 1.2 * stageMultiplier;
+                  fruit.position.x = Math.sin(i * (Math.PI * 2 / 5)) * 0.5;
+                  fruit.position.z = Math.cos(i * (Math.PI * 2 / 5)) * 0.5;
+                  plant3D.add(fruit);
+                }
+              } else if (plant !== 'tulsi') {
+                // Add small flowers on top for other plants
+                const flowerGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+                const flowerMaterial = new THREE.MeshStandardMaterial({ color: 0x9932CC }); // Purple
+                
+                for (let i = 0; i < 7; i++) {
+                  const flower = new THREE.Mesh(flowerGeometry, flowerMaterial);
+                  flower.position.y = 1.6 * stageMultiplier;
+                  flower.position.x = (Math.random() - 0.5) * 0.4;
+                  flower.position.z = (Math.random() - 0.5) * 0.4;
+                  plant3D.add(flower);
+                }
               }
             }
           }
