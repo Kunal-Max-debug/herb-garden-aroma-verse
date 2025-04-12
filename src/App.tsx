@@ -16,6 +16,7 @@ import AiRecommendations from "./pages/AiRecommendations";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
+import StartTour from "./pages/StartTour";
 
 // Create a client outside the component
 const queryClient = new QueryClient({
@@ -45,6 +46,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/start-tour" element={<StartTour />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

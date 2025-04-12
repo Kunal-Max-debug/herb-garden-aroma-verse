@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 // Define types for user and auth context
 interface User {
@@ -26,6 +26,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const savedUser = localStorage.getItem('user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
+
+  // Check if the token is still valid on initial load
+  useEffect(() => {
+    const checkUserAuth = () => {
+      const savedUser = localStorage.getItem('user');
+      if (savedUser) {
+        // In a real app, you would validate the token with a backend
+        // For now, we'll just make sure it exists
+        setUser(JSON.parse(savedUser));
+      } else {
+        setUser(null);
+      }
+    };
+    
+    checkUserAuth();
+    
+    // Set up a listener for storage events (to handle logout from other tabs)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'user' && e.newValue === null) {
+        setUser(null);
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Mock login function - in a real app, this would connect to a backend
   const login = async (email: string, password: string) => {
