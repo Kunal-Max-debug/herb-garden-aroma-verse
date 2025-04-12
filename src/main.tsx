@@ -4,7 +4,10 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-// Create root and render without StrictMode wrapping the entire app
-// This avoids double-rendering issues with React Query
+// Create root and render with proper React context
 const root = createRoot(document.getElementById('root')!);
-root.render(<App />);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);

@@ -16,7 +16,7 @@ interface AuthContextType {
   logout: () => void;
 }
 
-// Create the Auth Context
+// Create the Auth Context with a default undefined value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Create a provider component
