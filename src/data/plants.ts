@@ -1,4 +1,3 @@
-
 import { Plant } from '@/types';
 
 export const plantsData: Plant[] = [
@@ -47,7 +46,7 @@ export const plantsData: Plant[] = [
     botanicalName: "Ocimum sanctum (or Ocimum tenuiflorum)",
     commonNames: ["Holy Basil", "Sacred Basil", "Queen of Herbs"],
     systems: ["Ayurveda", "Yoga"],
-    imageUrl: "https://images.unsplash.com/photo-1518495973542-4542c06a5843",
+    imageUrl: "/lovable-uploads/d8765197-024d-4909-89b6-8878c675007b.png",
     habitat: "Native to the Indian subcontinent, now grown in many tropical parts of the world. Flourishes in tropical and subtropical conditions.",
     description: "Tulsi is a sacred plant in Hinduism and an important herb in Ayurvedic medicine. It has aromatic leaves with a distinctive clove-like scent and taste. The plant can be recognized by its purple-tinged leaves and stems.",
     medicinalUses: [
@@ -86,7 +85,7 @@ export const plantsData: Plant[] = [
     botanicalName: "Withania somnifera",
     commonNames: ["Indian Ginseng", "Winter Cherry", "Poison Gooseberry"],
     systems: ["Ayurveda", "Unani"],
-    imageUrl: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9",
+    imageUrl: "/lovable-uploads/ede8b124-48a3-4e55-b0f9-dad7889cdb17.png",
     habitat: "Native to dry regions of India, Middle East, and parts of Africa. Thrives in dry, subtropical conditions.",
     description: "Ashwagandha is a small, woody shrub with oval leaves and bell-shaped flowers that yield orange-red berries. The root is the primary part used in herbal medicine, known for its distinct horse-like smell (Ashwagandha means 'smell of horse' in Sanskrit).",
     medicinalUses: [
@@ -125,7 +124,7 @@ export const plantsData: Plant[] = [
     botanicalName: "Curcuma longa",
     commonNames: ["Haldi", "Indian Saffron", "Golden Spice"],
     systems: ["Ayurveda", "Unani", "Siddha"],
-    imageUrl: "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07",
+    imageUrl: "/lovable-uploads/1171dc6f-ca98-4ec2-a914-3714924789a2.png",
     habitat: "Native to Southeast Asia, primarily India. Requires a warm, humid climate and considerable rainfall.",
     description: "Turmeric is a perennial herbaceous plant with large, lily-like leaves and vibrant yellow-orange rhizomes (underground stems). The rhizome is the part used as a spice and medicine, containing curcumin, the active compound responsible for its bright color and therapeutic properties.",
     medicinalUses: [
@@ -164,7 +163,7 @@ export const plantsData: Plant[] = [
     botanicalName: "Azadirachta indica",
     commonNames: ["Indian Lilac", "Margosa Tree", "Nimtree"],
     systems: ["Ayurveda", "Unani", "Siddha"],
-    imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+    imageUrl: "/lovable-uploads/c0e20ced-c69f-4c59-a5bd-c95076f1b6a5.png",
     habitat: "Native to the Indian subcontinent. Thrives in tropical and subtropical regions, highly adaptable to different soil types.",
     description: "Neem is a fast-growing evergreen tree that can reach up to 15-20 meters in height. It has pinnate leaves, fragrant white flowers, and olive-like fruits. All parts of the tree, particularly the leaves, bark, and seeds, are used medicinally for their powerful antimicrobial and medicinal properties.",
     medicinalUses: [
@@ -203,7 +202,7 @@ export const plantsData: Plant[] = [
     botanicalName: "Bacopa monnieri",
     commonNames: ["Water Hyssop", "Herb of Grace", "Thyme-leaved Gratiola"],
     systems: ["Ayurveda"],
-    imageUrl: "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
+    imageUrl: "/lovable-uploads/adbc0149-0858-47f4-a020-3afc2aa1a358.png",
     habitat: "Native to wetlands of India, Australia, Europe, Africa, Asia, and North and South America. Thrives in marshy areas and along stream banks.",
     description: "Brahmi is a small, creeping herb with numerous branches and small, succulent leaves. It's one of the most important herbs in Ayurvedic medicine, especially known for its effects on the brain and nervous system.",
     medicinalUses: [
@@ -242,7 +241,7 @@ export const plantsData: Plant[] = [
     botanicalName: "Phyllanthus emblica",
     commonNames: ["Indian Gooseberry", "Emblic Myrobalan"],
     systems: ["Ayurveda", "Unani", "Siddha"],
-    imageUrl: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9",
+    imageUrl: "/lovable-uploads/1cf5d91d-0c74-4648-9605-38ba8fc7b615.png",
     habitat: "Native to India, grows in tropical and subtropical regions of Southeast Asia.",
     description: "Amla is a medium-sized deciduous tree with feathery leaves and round, light green fruits. The fruit is highly valued for its exceptionally high vitamin C content and is one of the most important medicinal fruits in Ayurveda.",
     medicinalUses: [
@@ -281,7 +280,7 @@ export const plantsData: Plant[] = [
     botanicalName: "Asparagus racemosus",
     commonNames: ["Wild Asparagus", "Indian Asparagus", "Hundred Husbands"],
     systems: ["Ayurveda"],
-    imageUrl: "https://images.unsplash.com/photo-1518495973542-4542c06a5843",
+    imageUrl: "/lovable-uploads/19501d32-a594-4d01-9500-714412f83459.png",
     habitat: "Native to India, Nepal, Sri Lanka, and the Himalayas. Grows in gravelly, rocky soils at altitudes up to 1500m.",
     description: "Shatavari is a climbing plant with pine needle-like leaves and small white flowers. The name 'Shatavari' means 'she who possesses a hundred husbands,' highlighting its traditional use as a female reproductive tonic.",
     medicinalUses: [
@@ -320,7 +319,7 @@ export const plantsData: Plant[] = [
     botanicalName: "Combination of Terminalia chebula, Terminalia bellirica, and Phyllanthus emblica",
     commonNames: ["Three Fruits", "Triphala Churna"],
     systems: ["Ayurveda"],
-    imageUrl: "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
+    imageUrl: "/lovable-uploads/a46f8945-67d6-4743-acc5-e66bfa64b7ba.png",
     habitat: "Components grow in various regions of India and Southeast Asia.",
     description: "Triphala is a traditional Ayurvedic herbal formulation consisting of three fruits: Amalaki (Emblica officinalis), Bibhitaki (Terminalia bellirica), and Haritaki (Terminalia chebula). It is one of the most important and widely used formulations in Ayurvedic medicine.",
     medicinalUses: [
