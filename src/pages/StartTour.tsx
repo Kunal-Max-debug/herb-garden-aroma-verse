@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,14 +10,14 @@ import { Slider } from '@/components/ui/slider';
 import { Sun, Moon, Leaf, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Import a placeholder image for tulsi plant instead of the missing image
+// Import neem tree image instead of tulsi plant
 // Using a relative path to ensure it can be found
-import tulsiPlantImage from '../assets/tulsi-plant.png';
+import neemTreeImage from '../assets/neem-tree.png';
 
 const StartTour = () => {
   const { isLoggedIn } = useAuth();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [plant, setPlant] = useState('tulsi');
+  const [plant, setPlant] = useState('neem'); // Set default to neem instead of tulsi
   const [season, setSeason] = useState('summer');
   const [timeOfDay, setTimeOfDay] = useState('day');
   const [growthSpeed, setGrowthSpeed] = useState(1);
@@ -106,61 +107,61 @@ const StartTour = () => {
           // Growth stage affects the size and complexity
           const stageMultiplier = 0.3 + (growthStage * 0.7);
           
-          if (plant === 'tulsi') {
-            // Create a special tulsi plant using the provided image
+          if (plant === 'neem') {
+            // Create a special neem tree using the provided image
             const textureLoader = new THREE.TextureLoader();
-            const tulsiTexture = textureLoader.load(tulsiPlantImage);
+            const neemTexture = textureLoader.load(neemTreeImage);
             
             if (growthStage < 0.3) {
               // Small seedling using billboard technique
               const geometry = new THREE.PlaneGeometry(0.8 * stageMultiplier, 0.8 * stageMultiplier);
               const material = new THREE.MeshBasicMaterial({ 
-                map: tulsiTexture,
+                map: neemTexture,
                 transparent: true,
                 side: THREE.DoubleSide
               });
-              const tulsiPlane = new THREE.Mesh(geometry, material);
-              tulsiPlane.position.y = 0.4 * stageMultiplier;
-              plant3D.add(tulsiPlane);
+              const neemPlane = new THREE.Mesh(geometry, material);
+              neemPlane.position.y = 0.4 * stageMultiplier;
+              plant3D.add(neemPlane);
               
               // Add a second plane rotated 90 degrees for 3D effect
-              const tulsiPlane2 = new THREE.Mesh(geometry, material);
-              tulsiPlane2.position.y = 0.4 * stageMultiplier;
-              tulsiPlane2.rotation.y = Math.PI / 2;
-              plant3D.add(tulsiPlane2);
+              const neemPlane2 = new THREE.Mesh(geometry, material);
+              neemPlane2.position.y = 0.4 * stageMultiplier;
+              neemPlane2.rotation.y = Math.PI / 2;
+              plant3D.add(neemPlane2);
             } 
             else if (growthStage < 0.6) {
               // Medium sized plant with multiple cross planes
               const geometry = new THREE.PlaneGeometry(1.3 * stageMultiplier, 1.3 * stageMultiplier);
               const material = new THREE.MeshBasicMaterial({ 
-                map: tulsiTexture,
+                map: neemTexture,
                 transparent: true,
                 side: THREE.DoubleSide
               });
               
               // Create multiple planes at different angles
               for (let i = 0; i < 4; i++) {
-                const tulsiPlane = new THREE.Mesh(geometry, material);
-                tulsiPlane.position.y = 0.65 * stageMultiplier;
-                tulsiPlane.rotation.y = i * Math.PI / 4;
-                plant3D.add(tulsiPlane);
+                const neemPlane = new THREE.Mesh(geometry, material);
+                neemPlane.position.y = 0.65 * stageMultiplier;
+                neemPlane.rotation.y = i * Math.PI / 4;
+                plant3D.add(neemPlane);
               }
             }
             else {
               // Full grown plant with multiple intersecting planes
               const geometry = new THREE.PlaneGeometry(2 * stageMultiplier, 2 * stageMultiplier);
               const material = new THREE.MeshBasicMaterial({ 
-                map: tulsiTexture,
+                map: neemTexture,
                 transparent: true,
                 side: THREE.DoubleSide
               });
               
               // Create multiple planes at different angles
               for (let i = 0; i < 8; i++) {
-                const tulsiPlane = new THREE.Mesh(geometry, material);
-                tulsiPlane.position.y = 1 * stageMultiplier;
-                tulsiPlane.rotation.y = i * Math.PI / 8;
-                plant3D.add(tulsiPlane);
+                const neemPlane = new THREE.Mesh(geometry, material);
+                neemPlane.position.y = 1 * stageMultiplier;
+                neemPlane.rotation.y = i * Math.PI / 8;
+                plant3D.add(neemPlane);
               }
               
               // Add a smaller group of planes higher up
@@ -170,6 +171,107 @@ const StartTour = () => {
                 topPlane.position.y = 1.5 * stageMultiplier;
                 topPlane.rotation.y = i * Math.PI / 6;
                 plant3D.add(topPlane);
+              }
+              
+              // Add fruits specific to neem tree
+              const fruitGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+              const fruitMaterial = new THREE.MeshStandardMaterial({ color: 0xFFD700 }); // Gold
+              
+              for (let i = 0; i < 7; i++) {
+                const fruit = new THREE.Mesh(fruitGeometry, fruitMaterial);
+                fruit.position.y = 1.2 * stageMultiplier;
+                fruit.position.x = Math.sin(i * (Math.PI * 2 / 7)) * 0.6;
+                fruit.position.z = Math.cos(i * (Math.PI * 2 / 7)) * 0.6;
+                plant3D.add(fruit);
+              }
+            }
+          } else if (plant === 'tulsi') {
+            // Use the existing geometry for tulsi plants
+            // Create growth stage appropriate model
+            if (growthStage < 0.3) {
+              // Seedling
+              const geometry = new THREE.CylinderGeometry(0.05, 0.05, 0.2 * stageMultiplier, 8);
+              const material = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // Brown stem
+              
+              const stemMesh = new THREE.Mesh(geometry, material);
+              stemMesh.position.y = 0.1 * stageMultiplier;
+              
+              // Small leaves
+              const leafGeometry = new THREE.SphereGeometry(0.1 * stageMultiplier, 8, 8);
+              const leafMaterial = new THREE.MeshStandardMaterial({ color: plantColor });
+              const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+              leaf.position.y = 0.2 * stageMultiplier;
+              
+              plant3D.add(stemMesh);
+              plant3D.add(leaf);
+            } 
+            else if (growthStage < 0.6) {
+              // Young plant
+              const geometry = new THREE.CylinderGeometry(0.1, 0.15, 0.8 * stageMultiplier, 8);
+              const material = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // Brown stem
+              
+              const stemMesh = new THREE.Mesh(geometry, material);
+              stemMesh.position.y = 0.4 * stageMultiplier;
+              
+              // Several leaves
+              plant3D.add(stemMesh);
+              
+              for (let i = 0; i < 3; i++) {
+                const leafGeometry = new THREE.SphereGeometry(0.15 * stageMultiplier, 8, 8);
+                leafGeometry.scale(1, 0.5, 1);
+                const leafMaterial = new THREE.MeshStandardMaterial({ color: plantColor });
+                const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+                leaf.position.y = 0.4 + (i * 0.2) * stageMultiplier;
+                leaf.rotation.z = i * (Math.PI * 2 / 3);
+                leaf.position.x = Math.sin(i * (Math.PI * 2 / 3)) * 0.3 * stageMultiplier;
+                leaf.position.z = Math.cos(i * (Math.PI * 2 / 3)) * 0.3 * stageMultiplier;
+                plant3D.add(leaf);
+              }
+            }
+            else {
+              // Mature plant
+              const geometry = new THREE.CylinderGeometry(0.15, 0.2, 1.5 * stageMultiplier, 8);
+              const material = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // Brown stem
+              
+              const stemMesh = new THREE.Mesh(geometry, material);
+              stemMesh.position.y = 0.75 * stageMultiplier;
+              
+              plant3D.add(stemMesh);
+              
+              // Multiple branches with leaves
+              for (let i = 0; i < 5; i++) {
+                const branchGeometry = new THREE.CylinderGeometry(0.05, 0.08, 0.5 * stageMultiplier, 8);
+                const branchMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                const branch = new THREE.Mesh(branchGeometry, branchMaterial);
+                
+                branch.position.y = 0.6 + (i * 0.2) * stageMultiplier;
+                branch.rotation.z = Math.PI / 4;
+                branch.rotation.y = i * (Math.PI * 2 / 5);
+                branch.position.x = Math.sin(i * (Math.PI * 2 / 5)) * 0.3;
+                branch.position.z = Math.cos(i * (Math.PI * 2 / 5)) * 0.3;
+                
+                // Leaves on each branch
+                const leafGeometry = new THREE.SphereGeometry(0.2 * stageMultiplier, 8, 8);
+                leafGeometry.scale(1, 0.5, 1);
+                const leafMaterial = new THREE.MeshStandardMaterial({ color: plantColor });
+                const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+                leaf.position.y = 0.3 * stageMultiplier;
+                leaf.position.x = 0.2 * stageMultiplier;
+                
+                branch.add(leaf);
+                plant3D.add(branch);
+              }
+              
+              // Small flowers on top for tulsi
+              const flowerGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+              const flowerMaterial = new THREE.MeshStandardMaterial({ color: 0x9932CC }); // Purple
+              
+              for (let i = 0; i < 7; i++) {
+                const flower = new THREE.Mesh(flowerGeometry, flowerMaterial);
+                flower.position.y = 1.6 * stageMultiplier;
+                flower.position.x = (Math.random() - 0.5) * 0.4;
+                flower.position.z = (Math.random() - 0.5) * 0.4;
+                plant3D.add(flower);
               }
             }
           } else {
@@ -501,8 +603,8 @@ const StartTour = () => {
                       <SelectValue placeholder="Select a plant" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="tulsi">Tulsi (Holy Basil)</SelectItem>
                       <SelectItem value="neem">Neem</SelectItem>
+                      <SelectItem value="tulsi">Tulsi (Holy Basil)</SelectItem>
                       <SelectItem value="ashwagandha">Ashwagandha</SelectItem>
                       <SelectItem value="brahmi">Brahmi</SelectItem>
                       <SelectItem value="mint">Mint</SelectItem>
@@ -610,8 +712,8 @@ const StartTour = () => {
                   <h3 className="font-semibold text-garden-dark">Plant Information</h3>
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  {plant === 'tulsi' && "Tulsi (Holy Basil) is a sacred plant in Hindu tradition and has significant medicinal properties. It thrives in warm seasons and needs moderate watering."}
                   {plant === 'neem' && "Neem is known for its antiseptic and pest-repellent properties. It's a hardy tree that can grow in various conditions but prefers tropical and sub-tropical climates."}
+                  {plant === 'tulsi' && "Tulsi (Holy Basil) is a sacred plant in Hindu tradition and has significant medicinal properties. It thrives in warm seasons and needs moderate watering."}
                   {plant === 'ashwagandha' && "Ashwagandha is an adaptogenic herb that helps the body manage stress. It prefers dry soil and warm conditions, growing well in full sun."}
                   {plant === 'brahmi' && "Brahmi is used in Ayurveda for improving memory and cognitive function. It prefers wet conditions and can even grow in shallow water or marshy areas."}
                   {plant === 'mint' && "Mint is a versatile herb used for digestive health in Ayurveda. It grows vigorously in partial shade to full sun and prefers consistently moist soil."}
