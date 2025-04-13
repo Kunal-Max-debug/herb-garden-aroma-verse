@@ -8,7 +8,7 @@ export const plantsData: Plant[] = [
     botanicalName: "Mentha (various species, including Mentha spicata, Mentha piperita)",
     commonNames: ["Mint", "Peppermint", "Spearmint", "Pudina"],
     systems: ["Ayurveda", "Unani"],
-    imageUrl: "/lovable-uploads/84200899-78a8-45bb-964b-504f851355f7.png",
+    imageUrl: "/lovable-uploads/6a3d6692-3d12-46af-b917-1d84096cf519.png",
     habitat: "Native to Europe and the Middle East, but now cultivated worldwide. Grows well in temperate climates and can be found near water sources in the wild.",
     description: "Mint is an aromatic herb with square stems and serrated leaves. The leaves contain essential oils, particularly menthol, which gives mint its characteristic aroma and flavor. It is a common culinary herb and has numerous medicinal properties.",
     medicinalUses: [
