@@ -25,6 +25,7 @@ const StartTour = () => {
   }
   
   const handlePlantChange = (value: string) => {
+    setIsLoading(true);
     setPlant(value);
   };
   
