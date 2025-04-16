@@ -1,10 +1,9 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useQuery } from '@tanstack/react-query';
-import { getUserProfile } from '@/lib/api';
 import { LogOut } from 'lucide-react';
 import {
   DropdownMenu,
@@ -17,13 +16,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
-  const { authState, logout } = useAuth();
+  const { user, isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
-  const { data: userProfile, isLoading, isError } = useQuery({
-    queryKey: ['userProfile'],
-    queryFn: () => getUserProfile(),
-    enabled: authState.isAuthenticated,
-  });
 
   const handleLogout = async () => {
     await logout();
@@ -46,22 +40,22 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          {authState.isAuthenticated ? (
+          {isLoggedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={userProfile?.profilePictureUrl} alt={userProfile?.name} />
-                    <AvatarFallback>{userProfile?.name?.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${user?.username}`} alt={user?.username} />
+                    <AvatarFallback>{user?.username?.charAt(0)}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{userProfile?.name}</p>
+                    <p className="text-sm font-medium leading-none">{user?.username}</p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      {userProfile?.email}
+                      {user?.email}
                     </p>
                   </div>
                 </DropdownMenuLabel>
