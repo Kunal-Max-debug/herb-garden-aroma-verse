@@ -1,115 +1,11 @@
-import React, { Suspense, useRef, useEffect } from 'react';
+
+import React, { Suspense } from 'react';
 import { RefreshCw } from 'lucide-react';
-import { Canvas, useFrame, useLoader } from '@react-three/fiber';
-import { OrbitControls, useGLTF, Environment } from '@react-three/drei';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import * as THREE from 'three';
-
-const MODELS = {
-  neem: "/models/neem_tree.glb",
-  tulsi: "/models/tulsi_plant.glb",
-  ashwagandha: "/models/ashwagandha.glb",
-  brahmi: "/models/brahmi_plant.glb", 
-  mint: "/models/mint_plant.glb"
-};
-
-const FALLBACK_MODEL = "/models/generic_plant.glb";
-
-const PlantModel = ({ plant, growthStage, season }) => {
-  let modelPath = MODELS[plant];
-  
-  const createFallbackPlant = () => {
-    const plantColor = {
-      neem: 0x228B22,
-      tulsi: 0x006400,
-      ashwagandha: 0x355E3B,
-      brahmi: 0x50C878,
-      mint: 0x98FB98
-    }[plant] || 0x006400;
-
-    const group = new THREE.Group();
-    const stageMultiplier = 0.3 + (growthStage * 0.7);
-    
-    const trunkGeometry = new THREE.CylinderGeometry(0.1, 0.15, stageMultiplier * 1.5, 8);
-    const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
-    const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
-    trunk.position.y = stageMultiplier * 0.75 - 0.5;
-    group.add(trunk);
-    
-    const topSize = stageMultiplier * 1.2;
-    const foliageGeometry = new THREE.SphereGeometry(topSize, 8, 8);
-    const foliageMaterial = new THREE.MeshStandardMaterial({ color: plantColor });
-    const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
-    foliage.position.y = stageMultiplier * 1.2;
-    group.add(foliage);
-    
-    const groundGeometry = new THREE.CircleGeometry(2, 32);
-    const groundMaterial = new THREE.MeshStandardMaterial({ 
-      color: season === 'winter' ? 0xFFFFFF : 0x654321
-    });
-    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -0.5;
-    group.add(ground);
-    
-    return group;
-  };
-
-  try {
-    const gltf = useLoader(GLTFLoader, modelPath);
-    
-    const scaleValue = 0.5 + (growthStage * 0.7);
-    gltf.scene.scale.set(scaleValue, scaleValue, scaleValue);
-    
-    useEffect(() => {
-      if (gltf.scene) {
-        if (plant === 'neem') {
-          gltf.scene.position.y = -0.5;
-        }
-      }
-    }, [gltf.scene, plant]);
-    
-    useFrame((state) => {
-      const time = state.clock.getElapsedTime();
-      if (gltf.scene.children.length > 0) {
-        gltf.scene.traverse((object) => {
-          if (object.name.includes('leaf') || object.name.includes('foliage')) {
-            object.rotation.x = Math.sin(time * 0.5) * 0.05;
-            object.rotation.z = Math.cos(time * 0.3) * 0.05;
-          }
-        });
-      }
-    });
-    
-    return <primitive object={gltf.scene} position={[0, -0.5, 0]} />;
-  } catch (error) {
-    console.warn(`Failed to load model for ${plant}, using fallback`, error);
-    const fallbackModel = createFallbackPlant();
-    return <primitive object={fallbackModel} position={[0, 0, 0]} />;
-  }
-};
-
-const SceneEnvironment = ({ timeOfDay, season }) => {
-  const backgroundColor = timeOfDay === 'day' 
-    ? new THREE.Color(0x87CEEB)
-    : new THREE.Color(0x0A1128);
-  
-  const lightIntensity = timeOfDay === 'day' ? 1 : 0.3;
-  const lightColor = timeOfDay === 'day' ? 0xFFFFFF : 0xB5D8FF;
-  
-  return (
-    <>
-      <color attach="background" args={[backgroundColor]} />
-      <ambientLight intensity={lightIntensity * 0.5} />
-      <directionalLight 
-        position={[5, 5, 5]} 
-        intensity={lightIntensity} 
-        color={lightColor} 
-      />
-      <Environment preset={timeOfDay === 'day' ? "sunset" : "night"} />
-    </>
-  );
-};
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import { PlantModel } from './plant-renderer/PlantModel';
+import { SceneEnvironment } from './plant-renderer/SceneEnvironment';
+import { MODELS } from './plant-renderer/constants';
 
 interface PlantRendererProps {
   plant: string;
@@ -152,7 +48,12 @@ const PlantRenderer: React.FC<PlantRendererProps> = ({
         >
           <Suspense fallback={null}>
             <SceneEnvironment timeOfDay={timeOfDay} season={season} />
-            <PlantModel plant={plant} growthStage={growthStage} season={season} />
+            <PlantModel 
+              plant={plant} 
+              growthStage={growthStage} 
+              season={season}
+              modelPath={MODELS[plant]}
+            />
             <OrbitControls 
               enablePan={false}
               enableZoom={true}
