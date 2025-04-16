@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -17,8 +16,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import StartTour from "./pages/StartTour";
+import PlantIdentification from "./pages/PlantIdentification";
 
-// Create a client outside the component
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -27,7 +26,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Define App as a proper function component
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -47,6 +45,7 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/start-tour" element={<StartTour />} />
+              <Route path="/plant-identification" element={<PlantIdentification />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
