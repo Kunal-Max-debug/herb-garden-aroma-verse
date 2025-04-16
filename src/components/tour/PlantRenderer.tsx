@@ -1,12 +1,10 @@
-
-import React, { Suspense, useRef } from 'react';
+import React, { Suspense, useRef, useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Environment } from '@react-three/drei';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as THREE from 'three';
 
-// Sample models (in production, you'd want to use real model paths)
 const MODELS = {
   neem: "/models/neem_tree.glb",
   tulsi: "/models/tulsi_plant.glb",
@@ -15,35 +13,29 @@ const MODELS = {
   mint: "/models/mint_plant.glb"
 };
 
-// Fallback model when specific model is not available
 const FALLBACK_MODEL = "/models/generic_plant.glb";
 
-// Model component with fallback capability
 const PlantModel = ({ plant, growthStage, season }) => {
   let modelPath = MODELS[plant];
   
-  // Create a mesh group as fallback when model fails to load
   const createFallbackPlant = () => {
     const plantColor = {
-      neem: 0x228B22,     // Forest green
-      tulsi: 0x006400,    // Dark green
-      ashwagandha: 0x355E3B, // Hunter green
-      brahmi: 0x50C878,   // Emerald
-      mint: 0x98FB98      // Pale green
+      neem: 0x228B22,
+      tulsi: 0x006400,
+      ashwagandha: 0x355E3B,
+      brahmi: 0x50C878,
+      mint: 0x98FB98
     }[plant] || 0x006400;
 
-    // Create plant based on growth stage
     const group = new THREE.Group();
     const stageMultiplier = 0.3 + (growthStage * 0.7);
     
-    // Trunk
     const trunkGeometry = new THREE.CylinderGeometry(0.1, 0.15, stageMultiplier * 1.5, 8);
     const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
     const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
     trunk.position.y = stageMultiplier * 0.75 - 0.5;
     group.add(trunk);
     
-    // Foliage
     const topSize = stageMultiplier * 1.2;
     const foliageGeometry = new THREE.SphereGeometry(topSize, 8, 8);
     const foliageMaterial = new THREE.MeshStandardMaterial({ color: plantColor });
@@ -51,10 +43,9 @@ const PlantModel = ({ plant, growthStage, season }) => {
     foliage.position.y = stageMultiplier * 1.2;
     group.add(foliage);
     
-    // Ground
     const groundGeometry = new THREE.CircleGeometry(2, 32);
     const groundMaterial = new THREE.MeshStandardMaterial({ 
-      color: season === 'winter' ? 0xFFFFFF : 0x654321  // Snow in winter, brown otherwise
+      color: season === 'winter' ? 0xFFFFFF : 0x654321
     });
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = -Math.PI / 2;
@@ -64,20 +55,23 @@ const PlantModel = ({ plant, growthStage, season }) => {
     return group;
   };
 
-  // Try to load the model, fall back to procedural if it fails
   try {
     const gltf = useLoader(GLTFLoader, modelPath);
     
-    // Adjust model based on growth stage
     const scaleValue = 0.5 + (growthStage * 0.7);
     gltf.scene.scale.set(scaleValue, scaleValue, scaleValue);
     
-    // Add simple animations
+    useEffect(() => {
+      if (gltf.scene) {
+        if (plant === 'neem') {
+          gltf.scene.position.y = -0.5;
+        }
+      }
+    }, [gltf.scene, plant]);
+    
     useFrame((state) => {
-      // Add subtle wind animation
       const time = state.clock.getElapsedTime();
       if (gltf.scene.children.length > 0) {
-        // Find leaf objects and apply gentle movement
         gltf.scene.traverse((object) => {
           if (object.name.includes('leaf') || object.name.includes('foliage')) {
             object.rotation.x = Math.sin(time * 0.5) * 0.05;
@@ -95,12 +89,10 @@ const PlantModel = ({ plant, growthStage, season }) => {
   }
 };
 
-// Scene environment adjustments based on time of day and season
 const SceneEnvironment = ({ timeOfDay, season }) => {
-  // Configure scene based on time of day and season
   const backgroundColor = timeOfDay === 'day' 
-    ? new THREE.Color(0x87CEEB) // Sky blue for day
-    : new THREE.Color(0x0A1128); // Dark blue for night
+    ? new THREE.Color(0x87CEEB)
+    : new THREE.Color(0x0A1128);
   
   const lightIntensity = timeOfDay === 'day' ? 1 : 0.3;
   const lightColor = timeOfDay === 'day' ? 0xFFFFFF : 0xB5D8FF;
